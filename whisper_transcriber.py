@@ -2,6 +2,9 @@ import streamlit as st
 import whisper
 import os
 
+# Set FFmpeg path manually (this helps if FFmpeg isn't detected)
+os.environ["PATH"] += os.pathsep + "/usr/local/bin"
+
 def save_uploaded_file(uploaded_file):
     """Save the uploaded file temporarily."""
     file_path = os.path.join("temp_audio.mp3")
