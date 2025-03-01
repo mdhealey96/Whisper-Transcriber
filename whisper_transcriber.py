@@ -1,13 +1,11 @@
 import streamlit as st
 import whisper
 import os
-
-# Set FFmpeg path manually (this helps if FFmpeg isn't detected)
-os.environ["PATH"] += os.pathsep + "/usr/local/bin"
+import ffmpeg  # Import ffmpeg-python to handle audio
 
 def save_uploaded_file(uploaded_file):
     """Save the uploaded file temporarily."""
-    file_path = os.path.join("temp_audio.mp3")
+    file_path = "temp_audio.mp3"
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     return file_path
@@ -15,10 +13,20 @@ def save_uploaded_file(uploaded_file):
 def transcribe_audio(file_path):
     """Transcribe audio using Whisper."""
     model = whisper.load_model("base")
-    result = model.transcribe(file_path)
+    
+    # Convert audio using ffmpeg-python (ensures compatibility)
+    input_audio = ffmpeg.input(file_path)
+    output_audio = ffmpeg.output(input_audio, "converted_audio.mp3", format="mp3")
+    ffmpeg.run(output_audio)
+
+    result = model.transcribe("converted_audio.mp3")
+    
+    # Cleanup converted file
+    os.remove("converted_audio.mp3")
+
     return result["text"]
 
-# Streamlit App UI
+# Streamlit UI
 st.title("Whisper MP3 Transcriber")
 st.write("Upload an MP3 file, and it will be transcribed using OpenAI's Whisper.")
 

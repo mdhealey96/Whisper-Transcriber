@@ -1,4 +1,4 @@
 streamlit
 openai-whisper
 torch
-ffmpeg
+ffmpeg-python
